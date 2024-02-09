@@ -1,0 +1,45 @@
+Input file: TRAIN_SIM.ROM
+Configuration file: C:\TERN\186\CONFIG\ACTF186.CFG
+Created by Paradigm LOCATE 6.00.114 on Fri Aug 08 11:41:57 2014
+Command line options: C:\Paradigm\bin\locate.exe -cc:\tern\186\config\actf186.cfg -d0 train_sim.rom 
+
+Memory Address Map for Program TRAIN_SIM
+
+ Start     Stop      Length   Segment                Class               
+ 000400H   0007E1H   003E2H   _DATA                  DATA            
+ 0007E2H   0007E3H   00002H   _CVTSEG                DATA            
+ 0007E4H   0007E4H   00000H   _SCNSEG                DATA            
+ 0007F0H   00297DH   0218EH   _BSS                   BSS             
+ 002980H   002980H   00000H   _NVRAM                 NVRAM           
+ 002980H   00298FH   00010H   _EDATA                 EDATA           
+ 002990H   002990H   00000H   _NHEAP                 STACK           
+ 002990H   002D8FH   00400H   _STACK                 STACK           
+ 002D90H   002D9FH   00010H   _ESTACK                STACK           
+ 002DA0H   002DA0H   00000H   _BFD                   FAR_DATA        
+ 002DA0H   002DAFH   00010H   _EFD                   ENDFAR_DATA     
+ 002DB0H   002DB0H   00000H   _BFB                   FAR_BSS         
+ 002DB0H   002DBFH   00010H   _EFB                   ENDFAR_BSS      
+ 002DC0H   002DC0H   00000H   _BFH                   FAR_HEAP        
+ 002DC0H   002DCFH   00010H   _EFH                   ENDFAR_HEAP     
+ 0C0000H   0C3806H   03807H   _TEXT                  CODE            
+ 0C3810H   0C39F1H   001E2H   E87_PROG               CODE            
+ 0C3A00H   0C616BH   0276CH   EMU_PROG               CODE            
+ 0C6170H   0C6181H   00012H   _INIT_                 INITDATA        
+ 0C6182H   0C6182H   00000H   _INITEND_              INITDATA        
+ 0C6190H   0C6190H   00000H   _EXIT_                 EXITDATA        
+ 0C6190H   0C619FH   00010H   _EXITEND_              EXITDATA        
+ 0C61A0H   0C61A0H   00000H   _BFC                   FAR_CONST       
+ 0C61A0H   0C61AFH   00010H   _EFC                   ENDFAR_CONST    
+ 0C61B0H   0C61B0H   00000H   _RD                    ROMDATA         
+ 0C61B0H   0C6591H   003E2H   _DATA                  ROMDATA         
+ 0C6592H   0C6593H   00002H   _CVTSEG                ROMDATA         
+ 0C6594H   0C6594H   00000H   _SCNSEG                ROMDATA         
+ 0C65A0H   0C65AFH   00010H   _ERD                   ENDROMDATA      
+ 0C65B0H   0C65B0H   00000H   _BRFD                  ROMFARDATA      
+ 0C65B0H   0C65B0H   00000H   _BFD                   ROMFARDATA      
+ 0C65B0H   0C65BFH   00010H   _ERFD                  ENDROMFARDATA   
+
+Entry point:   C000:0000
+Initial stack: 0040:2590
+
+

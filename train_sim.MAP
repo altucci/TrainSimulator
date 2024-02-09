@@ -1,0 +1,616 @@
+
+ Start  Stop   Length Name               Class
+
+ 00000H 03806H 03807H _TEXT              CODE
+ 03810H 039F1H 001E2H E87_PROG           CODE
+ 03A00H 0616BH 0276CH EMU_PROG           CODE
+ 06170H 06181H 00012H _INIT_             INITDATA
+ 06182H 06182H 00000H _INITEND_          INITDATA
+ 06190H 06190H 00000H _EXIT_             EXITDATA
+ 06190H 0619FH 00010H _EXITEND_          EXITDATA
+ 061A0H 061A0H 00000H _RD                ROMDATA
+ 061A0H 061AFH 00010H _ERD               ENDROMDATA
+ 061B0H 061B0H 00000H _BRFD              ROMFARDATA
+ 061B0H 061BFH 00010H _ERFD              ENDROMFARDATA
+ 061C0H 065A1H 003E2H _DATA              DATA
+ 065A2H 065A3H 00002H _CVTSEG            DATA
+ 065A4H 065A4H 00000H _SCNSEG            DATA
+ 065B0H 0873DH 0218EH _BSS               BSS
+ 08740H 08740H 00000H _NVRAM             NVRAM
+ 08740H 0874FH 00010H _EDATA             EDATA
+ 08750H 08750H 00000H _NHEAP             STACK
+ 08750H 08B4FH 00400H _STACK             STACK
+ 08B50H 08B5FH 00010H _ESTACK            STACK
+ 08B60H 08B60H 00000H _BFD               FAR_DATA
+ 08B60H 08B6FH 00010H _EFD               ENDFAR_DATA
+ 08B70H 08B70H 00000H _BFC               FAR_CONST
+ 08B70H 08B7FH 00010H _EFC               ENDFAR_CONST
+ 08B80H 08B80H 00000H _BFB               FAR_BSS
+ 08B80H 08B8FH 00010H _EFB               ENDFAR_BSS
+ 08B90H 08B90H 00000H _BFH               FAR_HEAP
+ 08B90H 08B9FH 00010H _EFH               ENDFAR_HEAP
+
+
+Detailed map of segments
+
+ 0000:0000 00A8 C=CODE   S=_TEXT          G=(none)   M=c0         ACBP=68
+ 0000:00A8 0F3B C=CODE   S=_TEXT          G=(none)   M=train_sim  ACBP=28
+ 0000:0FE3 0095 C=CODE   S=_TEXT          G=(none)   M=exit       ACBP=28
+ 0000:1078 0018 C=CODE   S=_TEXT          G=(none)   M=noxx       ACBP=28
+ 0000:1090 0050 C=CODE   S=_TEXT          G=(none)   M=fardata    ACBP=48
+ 0000:10E0 0044 C=CODE   S=_TEXT          G=(none)   M=farbss     ACBP=48
+ 0000:1124 007C C=CODE   S=_TEXT          G=(none)   M=atol       ACBP=28
+ 0000:11A0 0040 C=CODE   S=_TEXT          G=(none)   M=memset     ACBP=28
+ 0000:11E0 1358 C=CODE   S=_TEXT          G=(none)   M=ae         ACBP=28
+ 0000:2538 05F1 C=CODE   S=_TEXT          G=(none)   M=ser1_dma   ACBP=28
+ 0000:2B29 00AE C=CODE   S=_TEXT          G=(none)   M=h_ldiv     ACBP=28
+ 0000:2BD8 00B9 C=CODE   S=_TEXT          G=(none)   M=fpinit     ACBP=48
+ 0000:2C91 002C C=CODE   S=_TEXT          G=(none)   M=nftol      ACBP=28
+ 0000:2CBD 0017 C=CODE   S=_TEXT          G=(none)   M=n_lxmul    ACBP=28
+ 0000:2CD4 0024 C=CODE   S=_TEXT          G=(none)   M=atexit     ACBP=28
+ 0000:2CF8 0023 C=CODE   S=_TEXT          G=(none)   M=pcpprtl    ACBP=48
+ 0000:2D1B 0028 C=CODE   S=_TEXT          G=(none)   M=h_psbp     ACBP=28
+ 0000:2D43 0000 C=CODE   S=_TEXT          G=(none)   M=ctype      ACBP=28
+ 0000:2D43 02F3 C=CODE   S=_TEXT          G=(none)   M=aeee       ACBP=28
+ 0000:3036 001F C=CODE   S=_TEXT          G=(none)   M=memcpy     ACBP=28
+ 0000:3055 001A C=CODE   S=_TEXT          G=(none)   M=strlen     ACBP=28
+ 0000:306F 01CC C=CODE   S=_TEXT          G=(none)   M=realcvt2   ACBP=28
+ 0000:323B 0000 C=CODE   S=_TEXT          G=(none)   M=deflt87    ACBP=28
+ 0000:323B 0068 C=CODE   S=_TEXT          G=(none)   M=fperr      ACBP=28
+ 0000:32A3 0000 C=CODE   S=_TEXT          G=(none)   M=e87trap    ACBP=28
+ 0000:32A4 0007 C=CODE   S=_TEXT          G=(none)   M=term       ACBP=48
+ 0000:32AB 020C C=CODE   S=_TEXT          G=(none)   M=xcvt       ACBP=28
+ 0000:34B7 0004 C=CODE   S=_TEXT          G=(none)   M=cconv      ACBP=28
+ 0000:34BB 000C C=CODE   S=_TEXT          G=(none)   M=abort      ACBP=28
+ 0000:34C7 0000 C=CODE   S=_TEXT          G=(none)   M=sigdata    ACBP=28
+ 0000:34C7 000D C=CODE   S=_TEXT          G=(none)   M=pow10d     ACBP=28
+ 0000:34D4 0249 C=CODE   S=_TEXT          G=(none)   M=signal     ACBP=28
+ 0000:371D 00CC C=CODE   S=_TEXT          G=(none)   M=_pow10     ACBP=28
+ 0000:37E9 001E C=CODE   S=_TEXT          G=(none)   M=setvect    ACBP=28
+ 0381:0000 0000 C=CODE   S=E87_PROG       G=(none)   M=fpinit     ACBP=68
+ 0381:0000 01E2 C=CODE   S=E87_PROG       G=(none)   M=e87trap    ACBP=68
+ 03A0:0000 0000 C=CODE   S=EMU_PROG       G=(none)   M=fpinit     ACBP=68
+ 03A0:0000 276C C=CODE   S=EMU_PROG       G=(none)   M=emu086     ACBP=68
+ 0617:0000 0000 C=INITDATA S=_INIT_         G=IGROUP   M=c0         ACBP=68
+ 0617:0000 0006 C=INITDATA S=_INIT_         G=IGROUP   M=fardata    ACBP=48
+ 0617:0006 0006 C=INITDATA S=_INIT_         G=IGROUP   M=farbss     ACBP=48
+ 0617:000C 0006 C=INITDATA S=_INIT_         G=IGROUP   M=fpinit     ACBP=48
+ 0617:0012 0000 C=INITDATA S=_INITEND_      G=IGROUP   M=c0         ACBP=28
+ 0617:0020 0000 C=EXITDATA S=_EXIT_         G=IGROUP   M=c0         ACBP=68
+ 0617:0020 0010 C=EXITDATA S=_EXITEND_      G=IGROUP   M=c0         ACBP=28
+ 061A:0000 0000 C=ROMDATA S=_RD            G=(none)   M=c0         ACBP=68
+ 061A:0000 0010 C=ENDROMDATA S=_ERD           G=(none)   M=c0         ACBP=68
+ 061B:0000 0000 C=ROMFARDATA S=_BRFD          G=(none)   M=c0         ACBP=68
+ 061B:0000 0010 C=ENDROMFARDATA S=_ERFD          G=(none)   M=c0         ACBP=68
+ 061C:0000 0024 C=DATA   S=_DATA          G=DGROUP   M=c0         ACBP=68
+ 061C:0024 0040 C=DATA   S=_DATA          G=DGROUP   M=train_sim  ACBP=48
+ 061C:0064 0006 C=DATA   S=_DATA          G=DGROUP   M=exit       ACBP=48
+ 061C:006A 0008 C=DATA   S=_DATA          G=DGROUP   M=noxx       ACBP=48
+ 061C:0072 0000 C=DATA   S=_DATA          G=DGROUP   M=atol       ACBP=48
+ 061C:0072 0000 C=DATA   S=_DATA          G=DGROUP   M=memset     ACBP=48
+ 061C:0072 0000 C=DATA   S=_DATA          G=DGROUP   M=ae         ACBP=48
+ 061C:0072 0001 C=DATA   S=_DATA          G=DGROUP   M=ser1_dma   ACBP=48
+ 061C:0074 0000 C=DATA   S=_DATA          G=DGROUP   M=h_ldiv     ACBP=48
+ 061C:0074 0002 C=DATA   S=_DATA          G=DGROUP   M=fpinit     ACBP=48
+ 061C:0076 0000 C=DATA   S=_DATA          G=DGROUP   M=nftol      ACBP=48
+ 061C:0076 0000 C=DATA   S=_DATA          G=DGROUP   M=n_lxmul    ACBP=48
+ 061C:0076 0000 C=DATA   S=_DATA          G=DGROUP   M=atexit     ACBP=48
+ 061C:0076 0006 C=DATA   S=_DATA          G=DGROUP   M=pcpprtl    ACBP=48
+ 061C:007C 0000 C=DATA   S=_DATA          G=DGROUP   M=h_psbp     ACBP=48
+ 061C:007C 0101 C=DATA   S=_DATA          G=DGROUP   M=ctype      ACBP=48
+ 061C:017E 0008 C=DATA   S=_DATA          G=DGROUP   M=aeee       ACBP=48
+ 061C:0186 0000 C=DATA   S=_DATA          G=DGROUP   M=memcpy     ACBP=48
+ 061C:0186 0000 C=DATA   S=_DATA          G=DGROUP   M=strlen     ACBP=48
+ 061C:0186 0000 C=DATA   S=_DATA          G=DGROUP   M=realcvt2   ACBP=48
+ 061C:0186 0002 C=DATA   S=_DATA          G=DGROUP   M=deflt87    ACBP=48
+ 061C:0190 0111 C=DATA   S=_DATA          G=DGROUP   M=emuvars    ACBP=68
+ 061C:02A2 0071 C=DATA   S=_DATA          G=DGROUP   M=fperr      ACBP=48
+ 061C:0320 0000 C=DATA   S=_DATA          G=DGROUP   M=e87trap    ACBP=68
+ 061C:0320 0000 C=DATA   S=_DATA          G=DGROUP   M=xcvt       ACBP=48
+ 061C:0320 0027 C=DATA   S=_DATA          G=DGROUP   M=cconv      ACBP=48
+ 061C:0348 0000 C=DATA   S=_DATA          G=DGROUP   M=abort      ACBP=48
+ 061C:0348 0000 C=DATA   S=_DATA          G=DGROUP   M=sigdata    ACBP=48
+ 061C:0348 0000 C=DATA   S=_DATA          G=DGROUP   M=pow10d     ACBP=48
+ 061C:0348 001A C=DATA   S=_DATA          G=DGROUP   M=signal     ACBP=48
+ 061C:0362 0080 C=DATA   S=_DATA          G=DGROUP   M=_pow10     ACBP=48
+ 061C:03E2 0000 C=DATA   S=_DATA          G=DGROUP   M=setvect    ACBP=48
+ 061C:03E2 0000 C=DATA   S=_CVTSEG        G=DGROUP   M=c0         ACBP=48
+ 061C:03E2 0002 C=DATA   S=_CVTSEG        G=DGROUP   M=realcvt2   ACBP=48
+ 061C:03E4 0000 C=DATA   S=_SCNSEG        G=DGROUP   M=c0         ACBP=48
+ 061C:03F0 0002 C=BSS    S=_BSS           G=DGROUP   M=c0         ACBP=68
+ 061C:03F2 213E C=BSS    S=_BSS           G=DGROUP   M=train_sim  ACBP=48
+ 061C:2530 0000 C=BSS    S=_BSS           G=DGROUP   M=exit       ACBP=48
+ 061C:2530 0000 C=BSS    S=_BSS           G=DGROUP   M=noxx       ACBP=48
+ 061C:2530 0000 C=BSS    S=_BSS           G=DGROUP   M=atol       ACBP=48
+ 061C:2530 0000 C=BSS    S=_BSS           G=DGROUP   M=memset     ACBP=48
+ 061C:2530 000A C=BSS    S=_BSS           G=DGROUP   M=ae         ACBP=48
+ 061C:253A 002E C=BSS    S=_BSS           G=DGROUP   M=ser1_dma   ACBP=48
+ 061C:2568 0000 C=BSS    S=_BSS           G=DGROUP   M=fpinit     ACBP=48
+ 061C:2568 0012 C=BSS    S=_BSS           G=DGROUP   M=atexit     ACBP=48
+ 061C:257A 0002 C=BSS    S=_BSS           G=DGROUP   M=pcpprtl    ACBP=48
+ 061C:257C 0000 C=BSS    S=_BSS           G=DGROUP   M=ctype      ACBP=48
+ 061C:257C 0000 C=BSS    S=_BSS           G=DGROUP   M=aeee       ACBP=48
+ 061C:257C 0000 C=BSS    S=_BSS           G=DGROUP   M=memcpy     ACBP=48
+ 061C:257C 0000 C=BSS    S=_BSS           G=DGROUP   M=strlen     ACBP=48
+ 061C:257C 0000 C=BSS    S=_BSS           G=DGROUP   M=realcvt2   ACBP=48
+ 061C:257C 0000 C=BSS    S=_BSS           G=DGROUP   M=deflt87    ACBP=48
+ 061C:257C 0000 C=BSS    S=_BSS           G=DGROUP   M=fperr      ACBP=48
+ 061C:257C 0000 C=BSS    S=_BSS           G=DGROUP   M=xcvt       ACBP=48
+ 061C:257C 0000 C=BSS    S=_BSS           G=DGROUP   M=cconv      ACBP=48
+ 061C:257C 0000 C=BSS    S=_BSS           G=DGROUP   M=abort      ACBP=48
+ 061C:257C 0002 C=BSS    S=_BSS           G=DGROUP   M=sigdata    ACBP=48
+ 061C:257E 0000 C=BSS    S=_BSS           G=DGROUP   M=pow10d     ACBP=48
+ 061C:257E 0000 C=BSS    S=_BSS           G=DGROUP   M=signal     ACBP=48
+ 061C:257E 0000 C=BSS    S=_BSS           G=DGROUP   M=_pow10     ACBP=48
+ 061C:257E 0000 C=BSS    S=_BSS           G=DGROUP   M=setvect    ACBP=48
+ 061C:2580 0000 C=NVRAM  S=_NVRAM         G=DGROUP   M=c0         ACBP=68
+ 061C:2580 0010 C=EDATA  S=_EDATA         G=DGROUP   M=c0         ACBP=68
+ 061C:2590 0000 C=STACK  S=_NHEAP         G=DGROUP   M=c0         ACBP=74
+ 061C:2590 0400 C=STACK  S=_STACK         G=DGROUP   M=c0         ACBP=78
+ 061C:2990 0010 C=STACK  S=_ESTACK        G=DGROUP   M=c0         ACBP=74
+ 08B6:0000 0000 C=FAR_DATA S=_BFD           G=(none)   M=c0         ACBP=68
+ 08B6:0000 0010 C=ENDFAR_DATA S=_EFD           G=(none)   M=c0         ACBP=68
+ 08B7:0000 0000 C=FAR_CONST S=_BFC           G=(none)   M=c0         ACBP=68
+ 08B7:0000 0010 C=ENDFAR_CONST S=_EFC           G=(none)   M=c0         ACBP=68
+ 08B8:0000 0000 C=FAR_BSS S=_BFB           G=(none)   M=c0         ACBP=68
+ 08B8:0000 0010 C=ENDFAR_BSS S=_EFB           G=(none)   M=c0         ACBP=68
+ 08B9:0000 0000 C=FAR_HEAP S=_BFH           G=(none)   M=c0         ACBP=68
+ 08B9:0000 0010 C=ENDFAR_HEAP S=_EFH           G=(none)   M=c0         ACBP=68
+
+
+  Address         Publics by Name
+
+ 0000:2D19 idle  DGROUP@
+ 03A0:2147       e086_Entry
+ 03A0:26D7       e086_Shortcut
+ 0381:0040       e087_Trap
+ 03A0:25F4 idle  e287_FPU_Control
+ 03A0:274B idle  EmuVectorException
+ 0000:0010       exceptionInt
+ 0000:FE32 idle  FIARQQ
+ 0000:0E32 idle  FICRQQ
+ 0000:5C32       FIDRQQ
+ 0000:1632       FIERQQ
+ 0000:0632 idle  FISRQQ
+ 0000:24FB       FIWRQQ
+ 0000:4000 idle  FJARQQ
+ 0000:C000 idle  FJCRQQ
+ 0000:8000 idle  FJSRQQ
+ 0000:2B2C idle  F_LDIV@
+ 0000:2B3B idle  F_LMOD@
+ 0000:2B33 idle  F_LUDIV@
+ 0000:2B43 idle  F_LUMOD@
+ 0000:2D12 idle  F_OVERFLOW@
+ 0000:2D1E       F_PSBP@
+ 0000:2B2C idle  LDIV@
+ 0000:2B3B idle  LMOD@
+ 0000:2B33 idle  LUDIV@
+ 0000:2B43 idle  LUMOD@
+ 0000:2C91       N_FTOL@
+ 0000:2B29       N_LDIV@
+ 0000:2B38 idle  N_LMOD@
+ 0000:2B30 idle  N_LUDIV@
+ 0000:2B40 idle  N_LUMOD@
+ 0000:2CBD       N_LXMUL@
+ 0000:2D12 idle  N_OVERFLOW@
+ 0000:2D1B idle  N_PSBP@
+ 0000:2D12 idle  OVERFLOW@
+ 0000:2D1E idle  PSBP@
+ 03A0:215C idle  rs1
+ 03A0:26AD idle  rs2
+ 0000:34BB       _abort
+ 0000:1FEA idle  _ae86_ad12
+ 0000:207A idle  _ae86_da
+ 0000:1A86 idle  _ae_ad12
+ 0000:1F48 idle  _ae_da
+ 0000:1224       _ae_init
+ 0000:11FF idle  _ae_reset
+ 0000:1605 idle  _amd_ee_byte_pro_128
+ 0000:15B2 idle  _amd_ee_byte_pro_512
+ 0000:1461 idle  _amd_ee_read_reset
+ 0000:1481 idle  _amd_ee_sec_erase
+ 0000:2CD4 idle  _atexit
+ 0000:1194 idle  _atoi
+ 0000:1124       _atol
+ 0000:06DA idle  _BeginTrainSimulationProcess
+ 0000:0D34 idle  _CheckSerialComm
+ 0000:29D9       _clean_ser1
+ 0000:13D0 idle  _clka_en
+ 0000:13EF idle  _clkb_en
+ 061C:03F2 idle  _CommVals
+ 0000:1EE0 idle  _crc16
+ 061C:0000 idle  _DATASEG@
+ 0000:13A5 idle  _delay0
+ 0000:137D       _delay_ms
+ 0000:25BD idle  _dma1_isr
+ 061C:017E idle  _eemap
+ 0000:2D43       _ee_clkhi
+ 0000:2D4E       _ee_clklo
+ 0000:2F0E idle  _ee_hdr
+ 0000:2F52 idle  _ee_init
+ 0000:2EB9 idle  _ee_out
+ 0000:2E15 idle  _ee_rd
+ 0000:2D78       _ee_sda0
+ 0000:2D59       _ee_sda1
+ 0000:2F94       _ee_start
+ 0000:2FE5       _ee_stop
+ 0000:2D97 idle  _ee_wr
+ 0000:0708 idle  _EndTrainSimulationProcess
+ 061C:257A       _errno
+ 0000:103D       _exit
+ 0000:2981       _getser1
+ 0000:2838 idle  _getsers1
+ 0000:1444       _hitwd
+ 0000:13B4       _HLPRsetvect
+ 0000:0119 idle  _initialize
+ 0000:1B14 idle  _int0_init
+ 0000:1B56 idle  _int1_init
+ 0000:1B98 idle  _int2_init
+ 0000:1BE5 idle  _int3_init
+ 0000:1C27 idle  _int4_init
+ 0000:1C74 idle  _int5_init
+ 0000:1CC1 idle  _int6_init
+ 0000:0235 idle  _int_timer_isr
+ 0000:1E6A idle  _io_wait
+ 0000:18C6 idle  _KERNELsetvect
+ 0000:11E0 idle  _led
+ 0000:34B7 idle  _localeconv
+ 0000:00A8       _main
+ 0000:05CF idle  _ManageTrainSimulationKey
+ 0000:3036       _memcpy
+ 0000:11C6       _memset
+ 0000:1AFD idle  _nmi_init
+ 0000:18EF idle  _PDREMHandler
+ 0000:1D0E       _pio_init
+ 0000:1E56 idle  _pio_rd
+ 0000:1DDB idle  _pio_wr
+ 0000:34C7       _pow10
+ 0000:2897 idle  _puts1
+ 0000:2900       _putser1
+ 0000:28D3 idle  _putsers1
+ 0000:142D idle  _pwr_save_divide
+ 0000:140E idle  _pwr_save_en
+ 0000:36AB       _raise
+ 0000:1EC8 idle  _ram_wait
+ 0000:1E97 idle  _rom_wait
+ 0000:23C1 idle  _rtc1337_init
+ 0000:20EB idle  _rtc1337_rd
+ 0000:21EB idle  _rtc1337_rds
+ 0000:185B idle  _rtc_init
+ 0000:1779 idle  _rtc_rd
+ 0000:1662 idle  _rtc_rds
+ 0000:2357 idle  _r_out
+ 0000:22FB idle  _r_rd
+ 0000:27D3 idle  _s1_close
+ 0000:2A1F idle  _s1_cts
+ 0000:2A7E idle  _s1_echo
+ 0000:2A95 idle  _s1_flush
+ 0000:2601       _s1_init
+ 0000:2550 idle  _s1_isr
+ 0000:2538 idle  _s1_rec_e
+ 0000:2A49 idle  _s1_rts
+ 0000:2544 idle  _s1_send_e
+ 0000:2A44 idle  _s1_status
+ 061C:253A       _ser1_com
+ 0000:2950       _serhit1
+ 0000:2AA9 idle  _ser_get_bufn
+ 0000:11A0 idle  _setmem
+ 0000:37E9       _setvect
+ 0000:3621 idle  _signal
+ 0000:0766 idle  _StartTrainSimulation
+ 0000:3055       _strlen
+ 0000:1955 idle  _t0_init
+ 0000:1A3B idle  _t0_rd
+ 0000:19A4 idle  _t1_init
+ 0000:1A54 idle  _t1_rd
+ 0000:19F3       _t2_init
+ 0000:1A6D idle  _t2_rd
+ 061C:23F4 idle  _Vars
+ 061C:2530 idle  _wEnter
+ 061C:2532 idle  _wExit
+ 061C:2534 idle  _wMask
+ 061C:2538 idle  _wNMI
+ 061C:2536 idle  _wUnmask
+ 061C:0022 idle  __8086
+ 061C:0074 idle  __8087
+ 0000:2D04       __abort
+ 0000:000C idle  __AHSHIFT
+ 061C:2568       __atexitcnt
+ 061C:256A       __atexittbl
+ 061C:03F0 idle  __bss_start
+ 0000:105E idle  __cexit
+ 0000:2D03       __checknull
+ 0000:2D02       __cleanup
+ 0000:1090       __CopyFarData
+ 061C:007C       __ctype
+ 0000:106C idle  __c_exit
+ 061C:0000 idle  __data_start
+ 061C:0186       __default87
+ 061C:0190       __emu
+ 0000:1089       __ExceptInit
+ 061C:0020 idle  __Exception_list
+ 0000:104C       __exit
+ 061C:0064 idle  __exitbuf
+ 061C:0066 idle  __exitfopen
+ 061C:0068 idle  __exitopen
+ 08B8:0000       __farbss_end
+ 08B8:0000       __farbss_start
+ 08B7:0000 idle  __farconst_end
+ 08B7:0000 idle  __farconst_start
+ 08B6:0000       __fardata_end
+ 08B6:0000       __fardata_start
+ 08B9:0000 idle  __farheap_end
+ 08B9:0000 idle  __farheap_start
+ 0000:323B       __fperror
+ 0000:2C8A       __fpuint
+ 0000:2D0B idle  __fpure_error_
+ 0000:108A idle  __GetPolymorphicDTC(void*,unsigned int)
+ 0000:108D idle  __GetPolymorphicDTCfar(void*,unsigned int)
+ 0000:10E0       __InitFarBss
+ 061C:0320       __localeconvention
+ 0000:2D0B idle  __npure_error_
+ 061C:2580 idle  __nvram_start
+ 0000:32A9 idle  __ParadigmDosUnsupported
+ 0000:32AA idle  __ParadigmFarHeapCheck
+ 0000:32A4       __ParadigmTerminate
+ 0000:000C idle  __PCFAST
+ 0000:1000 idle  __PCINCR
+ 0000:000F idle  __PCMASK
+ 0000:0000 idle  __PCMODE
+ 0000:0004       __PCSHIFT
+ 0000:371D       __POW10
+ 061C:03E2 idle  __RealCvtVector
+ 0000:1078 idle  __RefDestructorCount()
+ 0000:107E idle  __RefExceptionList()
+ 061A:0000 idle  __romdata_end
+ 061A:0000 idle  __romdata_start
+ 061B:0000       __romfardata_end
+ 061B:0000       __romfardata_start
+ 061C:03E4 idle  __ScanTodVector
+ 061C:2590 idle  __stack_bottom
+ 061C:2990 idle  __stack_top
+ 0000:0000       __startup
+ 061C:2580       __staticdata_end
+ 061C:03F0 idle  __stklen
+ 0000:2CF8       __terminate
+ 0000:0000       __turboCvt
+ 061C:0076 idle  __version
+ 0000:32AB       __XCVT
+ 061C:0078 idle  ___brklvl
+ 0000:1085 idle  ___ExitExceptBlocks
+ 0000:2C12 idle  ___fpreset
+ 061C:007A idle  ___heapbase
+ 0000:1088 idle  ___InitExceptBlock
+ 0000:1084 idle  ___InitExceptBlocks
+ 061C:257C       ___SignalPtr
+
+
+  Address         Publics by Value
+
+ 0000:0000       __startup
+ 0000:0000       __turboCvt
+ 0000:0000 idle  __PCMODE
+ 0000:0004       __PCSHIFT
+ 0000:000C idle  __AHSHIFT
+ 0000:000C idle  __PCFAST
+ 0000:000F idle  __PCMASK
+ 0000:0010       exceptionInt
+ 0000:00A8       _main
+ 0000:0119 idle  _initialize
+ 0000:0235 idle  _int_timer_isr
+ 0000:05CF idle  _ManageTrainSimulationKey
+ 0000:0632 idle  FISRQQ
+ 0000:06DA idle  _BeginTrainSimulationProcess
+ 0000:0708 idle  _EndTrainSimulationProcess
+ 0000:0766 idle  _StartTrainSimulation
+ 0000:0D34 idle  _CheckSerialComm
+ 0000:0E32 idle  FICRQQ
+ 0000:1000 idle  __PCINCR
+ 0000:103D       _exit
+ 0000:104C       __exit
+ 0000:105E idle  __cexit
+ 0000:106C idle  __c_exit
+ 0000:1078 idle  __RefDestructorCount()
+ 0000:107E idle  __RefExceptionList()
+ 0000:1084 idle  ___InitExceptBlocks
+ 0000:1085 idle  ___ExitExceptBlocks
+ 0000:1088 idle  ___InitExceptBlock
+ 0000:1089       __ExceptInit
+ 0000:108A idle  __GetPolymorphicDTC(void*,unsigned int)
+ 0000:108D idle  __GetPolymorphicDTCfar(void*,unsigned int)
+ 0000:1090       __CopyFarData
+ 0000:10E0       __InitFarBss
+ 0000:1124       _atol
+ 0000:1194 idle  _atoi
+ 0000:11A0 idle  _setmem
+ 0000:11C6       _memset
+ 0000:11E0 idle  _led
+ 0000:11FF idle  _ae_reset
+ 0000:1224       _ae_init
+ 0000:137D       _delay_ms
+ 0000:13A5 idle  _delay0
+ 0000:13B4       _HLPRsetvect
+ 0000:13D0 idle  _clka_en
+ 0000:13EF idle  _clkb_en
+ 0000:140E idle  _pwr_save_en
+ 0000:142D idle  _pwr_save_divide
+ 0000:1444       _hitwd
+ 0000:1461 idle  _amd_ee_read_reset
+ 0000:1481 idle  _amd_ee_sec_erase
+ 0000:15B2 idle  _amd_ee_byte_pro_512
+ 0000:1605 idle  _amd_ee_byte_pro_128
+ 0000:1632       FIERQQ
+ 0000:1662 idle  _rtc_rds
+ 0000:1779 idle  _rtc_rd
+ 0000:185B idle  _rtc_init
+ 0000:18C6 idle  _KERNELsetvect
+ 0000:18EF idle  _PDREMHandler
+ 0000:1955 idle  _t0_init
+ 0000:19A4 idle  _t1_init
+ 0000:19F3       _t2_init
+ 0000:1A3B idle  _t0_rd
+ 0000:1A54 idle  _t1_rd
+ 0000:1A6D idle  _t2_rd
+ 0000:1A86 idle  _ae_ad12
+ 0000:1AFD idle  _nmi_init
+ 0000:1B14 idle  _int0_init
+ 0000:1B56 idle  _int1_init
+ 0000:1B98 idle  _int2_init
+ 0000:1BE5 idle  _int3_init
+ 0000:1C27 idle  _int4_init
+ 0000:1C74 idle  _int5_init
+ 0000:1CC1 idle  _int6_init
+ 0000:1D0E       _pio_init
+ 0000:1DDB idle  _pio_wr
+ 0000:1E56 idle  _pio_rd
+ 0000:1E6A idle  _io_wait
+ 0000:1E97 idle  _rom_wait
+ 0000:1EC8 idle  _ram_wait
+ 0000:1EE0 idle  _crc16
+ 0000:1F48 idle  _ae_da
+ 0000:1FEA idle  _ae86_ad12
+ 0000:207A idle  _ae86_da
+ 0000:20EB idle  _rtc1337_rd
+ 0000:21EB idle  _rtc1337_rds
+ 0000:22FB idle  _r_rd
+ 0000:2357 idle  _r_out
+ 0000:23C1 idle  _rtc1337_init
+ 0000:24FB       FIWRQQ
+ 0000:2538 idle  _s1_rec_e
+ 0000:2544 idle  _s1_send_e
+ 0000:2550 idle  _s1_isr
+ 0000:25BD idle  _dma1_isr
+ 0000:2601       _s1_init
+ 0000:27D3 idle  _s1_close
+ 0000:2838 idle  _getsers1
+ 0000:2897 idle  _puts1
+ 0000:28D3 idle  _putsers1
+ 0000:2900       _putser1
+ 0000:2950       _serhit1
+ 0000:2981       _getser1
+ 0000:29D9       _clean_ser1
+ 0000:2A1F idle  _s1_cts
+ 0000:2A44 idle  _s1_status
+ 0000:2A49 idle  _s1_rts
+ 0000:2A7E idle  _s1_echo
+ 0000:2A95 idle  _s1_flush
+ 0000:2AA9 idle  _ser_get_bufn
+ 0000:2B29       N_LDIV@
+ 0000:2B2C idle  LDIV@
+ 0000:2B2C idle  F_LDIV@
+ 0000:2B30 idle  N_LUDIV@
+ 0000:2B33 idle  F_LUDIV@
+ 0000:2B33 idle  LUDIV@
+ 0000:2B38 idle  N_LMOD@
+ 0000:2B3B idle  F_LMOD@
+ 0000:2B3B idle  LMOD@
+ 0000:2B40 idle  N_LUMOD@
+ 0000:2B43 idle  LUMOD@
+ 0000:2B43 idle  F_LUMOD@
+ 0000:2C12 idle  ___fpreset
+ 0000:2C8A       __fpuint
+ 0000:2C91       N_FTOL@
+ 0000:2CBD       N_LXMUL@
+ 0000:2CD4 idle  _atexit
+ 0000:2CF8       __terminate
+ 0000:2D02       __cleanup
+ 0000:2D03       __checknull
+ 0000:2D04       __abort
+ 0000:2D0B idle  __fpure_error_
+ 0000:2D0B idle  __npure_error_
+ 0000:2D12 idle  F_OVERFLOW@
+ 0000:2D12 idle  N_OVERFLOW@
+ 0000:2D12 idle  OVERFLOW@
+ 0000:2D19 idle  DGROUP@
+ 0000:2D1B idle  N_PSBP@
+ 0000:2D1E idle  PSBP@
+ 0000:2D1E       F_PSBP@
+ 0000:2D43       _ee_clkhi
+ 0000:2D4E       _ee_clklo
+ 0000:2D59       _ee_sda1
+ 0000:2D78       _ee_sda0
+ 0000:2D97 idle  _ee_wr
+ 0000:2E15 idle  _ee_rd
+ 0000:2EB9 idle  _ee_out
+ 0000:2F0E idle  _ee_hdr
+ 0000:2F52 idle  _ee_init
+ 0000:2F94       _ee_start
+ 0000:2FE5       _ee_stop
+ 0000:3036       _memcpy
+ 0000:3055       _strlen
+ 0000:323B       __fperror
+ 0000:32A4       __ParadigmTerminate
+ 0000:32A9 idle  __ParadigmDosUnsupported
+ 0000:32AA idle  __ParadigmFarHeapCheck
+ 0000:32AB       __XCVT
+ 0000:34B7 idle  _localeconv
+ 0000:34BB       _abort
+ 0000:34C7       _pow10
+ 0000:3621 idle  _signal
+ 0000:36AB       _raise
+ 0000:371D       __POW10
+ 0000:37E9       _setvect
+ 0000:4000 idle  FJARQQ
+ 0000:5C32       FIDRQQ
+ 0000:8000 idle  FJSRQQ
+ 0000:C000 idle  FJCRQQ
+ 0000:FE32 idle  FIARQQ
+ 0381:0040       e087_Trap
+ 03A0:2147       e086_Entry
+ 03A0:215C idle  rs1
+ 03A0:25F4 idle  e287_FPU_Control
+ 03A0:26AD idle  rs2
+ 03A0:26D7       e086_Shortcut
+ 03A0:274B idle  EmuVectorException
+ 061A:0000 idle  __romdata_end
+ 061A:0000 idle  __romdata_start
+ 061B:0000       __romfardata_end
+ 061B:0000       __romfardata_start
+ 061C:0000 idle  _DATASEG@
+ 061C:0000 idle  __data_start
+ 061C:0020 idle  __Exception_list
+ 061C:0022 idle  __8086
+ 061C:0064 idle  __exitbuf
+ 061C:0066 idle  __exitfopen
+ 061C:0068 idle  __exitopen
+ 061C:0074 idle  __8087
+ 061C:0076 idle  __version
+ 061C:0078 idle  ___brklvl
+ 061C:007A idle  ___heapbase
+ 061C:007C       __ctype
+ 061C:017E idle  _eemap
+ 061C:0186       __default87
+ 061C:0190       __emu
+ 061C:0320       __localeconvention
+ 061C:03E2 idle  __RealCvtVector
+ 061C:03E4 idle  __ScanTodVector
+ 061C:03F0 idle  __bss_start
+ 061C:03F0 idle  __stklen
+ 061C:03F2 idle  _CommVals
+ 061C:23F4 idle  _Vars
+ 061C:2530 idle  _wEnter
+ 061C:2532 idle  _wExit
+ 061C:2534 idle  _wMask
+ 061C:2536 idle  _wUnmask
+ 061C:2538 idle  _wNMI
+ 061C:253A       _ser1_com
+ 061C:2568       __atexitcnt
+ 061C:256A       __atexittbl
+ 061C:257A       _errno
+ 061C:257C       ___SignalPtr
+ 061C:2580 idle  __nvram_start
+ 061C:2580       __staticdata_end
+ 061C:2590 idle  __stack_bottom
+ 061C:2990 idle  __stack_top
+ 08B6:0000       __fardata_start
+ 08B6:0000       __fardata_end
+ 08B7:0000 idle  __farconst_end
+ 08B7:0000 idle  __farconst_start
+ 08B8:0000       __farbss_start
+ 08B8:0000       __farbss_end
+ 08B9:0000 idle  __farheap_start
+ 08B9:0000 idle  __farheap_end
+
+
+Program entry point at 0000:0000
+

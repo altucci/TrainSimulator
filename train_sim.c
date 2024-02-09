@@ -1,0 +1,653 @@
+#include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
+#include <dos.h>
+#include <math.h>
+#include "ae.h"
+
+#include "ser1.h"
+
+#define BUF_LENGTH								4096
+
+#define TIMER_MAX_COUNT							2000L
+
+#define SIGNAL_TC_ADDR							0x01
+#define SIGNAL_1_ADDR							0x02
+#define SIGNAL_2_ADDR							0x08
+#define SIGNAL_3_ADDR							0x20
+#define SIGNAL_4_ADDR							0x80
+
+#define PARAM_ID_NUMBER_OF_TRAINS				101
+#define PARAM_ID_SECONDS_BETWEEN_TRAINS			102
+
+#define PARAM_ID_TRAIN_DIRECTION				103
+#define PARAM_ID_TRAIN_SPEED					104
+
+#define PARAM_ID_NUMBER_OF_LOCOMOTIVES			105
+#define PARAM_ID_NUMBER_OF_RAILCARS				106
+
+#define PARAM_ID_DISTANCE_BETWEEN_AXLES			107
+#define PARAM_ID_DISTANCE_BETWEEN_BOGIES		108
+#define PARAM_ID_DISTANCE_BETWEEN_CARS			109
+#define PARAM_ID_DISTANCE_BETWEEN_SENSORS		110
+
+extern COM ser1_com;
+
+typedef struct
+{
+	COM *m_comPC1;
+
+	unsigned char serPC1_in_buf[BUF_LENGTH];
+	unsigned char serPC1_out_buf[BUF_LENGTH];
+
+} COMM_VALS;
+
+COMM_VALS CommVals;
+
+typedef struct
+{
+	unsigned char DigitalOutputsPort0;
+
+	int TrainSimulationKeyState;
+	int TrainSimulationKeyCheck;
+
+	int TrainSimulationStateFromKey;
+
+	int TrainSimulation;
+	int SendTrainSimulationCompleted;
+
+	int StopTrainSimulation;
+
+	int TrainSimulationState;
+	long TrainSimulationCounter;
+	int CheckTrainSimulation;
+
+	int StartAxles;
+
+	int NumberOfTrainsCounter;
+	int NumberOfTrains;
+	long SecondsBetweenTrainsCounter;
+	long SecondsBetweenTrains;
+	int CheckSecondsBetweenTrains;
+
+	int TrainDirection;
+	double TrainSpeedMPH;
+	int NumberOfCars[2];
+	double TrainDistance[4];
+
+	double TimerCyclesValue[5];
+
+	long TimerCyclesCounter[4];
+	long TimerCyclesPerPulseHigh;
+	long TimerCyclesPerPulse[4][6];
+	int TimerCyclesPerPulseIndex[4];
+	int TimerCyclesPerPulseIndexMaxVal[4];
+	long TimerCyclesShiftCounter;
+	long TimerCyclesShift[3];
+
+	int AxleCounter[4];
+	int AxleCountTotal[4];
+
+	int AxleActive[4];
+
+	unsigned char TrainSignal[5];
+
+	long TimerFrequency;
+	long TimerMaxCount;
+
+	long TimerCounter;
+	unsigned long TimerCounterSeconds;
+
+} VARS;
+
+VARS Vars;
+
+void initialize(void);
+void interrupt far int_timer_isr(void);
+void ManageTrainSimulationKey(void);
+void BeginTrainSimulationProcess(void);
+void EndTrainSimulationProcess(void);
+void StartTrainSimulation(void);
+int CheckSerialComm(void);
+
+void main(void)
+{
+	initialize();
+
+	while (1)
+	{
+		while (CheckSerialComm() != -1)
+			hitwd();
+
+		ManageTrainSimulationKey();
+
+		if (Vars.StartAxles)
+		{
+			StartTrainSimulation();
+			Vars.StartAxles = 0;
+		}
+
+		if (Vars.SendTrainSimulationCompleted)
+		{
+			putser1('z', CommVals.m_comPC1);
+			Vars.SendTrainSimulationCompleted = 0;
+		}
+
+		if (Vars.TimerCounter >= Vars.TimerFrequency)
+		{
+			Vars.TimerCounter = 0;
+			Vars.TimerCounterSeconds++;
+			hitwd();
+		}
+	}
+}
+
+void initialize(void)
+{
+	ae_init();
+	pio_init(11,1);
+	pio_init(18, 0);	//	P18=CTS1 for U24 CS
+	pio_init(3,0);
+
+	// Configure & Initialize H5 Ports (82C55)
+	outportb(0x0103, 0x82);
+	outportb(0x0100, 0x01);
+
+	// Initialize Comm Ports
+	memset(&CommVals, 0, sizeof(CommVals));
+
+	CommVals.m_comPC1 = &ser1_com;
+	s1_init(9, CommVals.serPC1_in_buf, BUF_LENGTH, CommVals.serPC1_out_buf, BUF_LENGTH, CommVals.m_comPC1);  	// 19,200 baud
+	
+	clean_ser1(CommVals.m_comPC1);
+	
+	memset(&Vars, 0, sizeof(Vars));
+
+	Vars.DigitalOutputsPort0 = 0x01;
+
+	Vars.NumberOfTrains = 1;
+	Vars.SecondsBetweenTrains = 0;
+
+	Vars.TrainSpeedMPH = 59.8086;
+
+	Vars.NumberOfCars[0] = 0;
+	Vars.NumberOfCars[1] = 70;
+
+	Vars.TrainDistance[0] = 1828.8;
+	Vars.TrainDistance[1] = 11684.0;
+	Vars.TrainDistance[2] = 4775.2;
+	Vars.TrainDistance[3] = 304.8;
+
+	/*
+	Vars.TrainDistance[0] = 1778.0;
+	Vars.TrainDistance[1] = 11633.2;
+	Vars.TrainDistance[2] = 4711.7;
+	Vars.TrainDistance[3] = 254.0;
+	*/
+	
+	Vars.TrainSignal[4] = SIGNAL_TC_ADDR;
+
+	// Initialize Timer 2 Interrupt
+	Vars.TimerMaxCount = TIMER_MAX_COUNT;
+	Vars.TimerFrequency = 10000000L / Vars.TimerMaxCount;	//TimerFrequency = 10,000,000 / TimerMaxCount, so if TimerMaxCount = 500, then TimerFrequency = 20,000 Hz = 200 ints/sec = 1 timer int/50 microseconds
+
+	t2_init(0xE001, (unsigned int)Vars.TimerMaxCount, int_timer_isr);
+}
+
+void interrupt far int_timer_isr(void)
+{
+	int i;
+
+	if (Vars.TrainSimulation)
+	{
+		for (i = 0;i < 4;i++)
+		{
+			if (Vars.AxleActive[i])
+			{
+				if (++Vars.TimerCyclesCounter[i] <= Vars.TimerCyclesPerPulseHigh)
+				{
+					Vars.DigitalOutputsPort0 |= Vars.TrainSignal[i];
+				}
+				else
+				{
+					Vars.DigitalOutputsPort0 &= 0xFF ^ Vars.TrainSignal[i];
+
+					if (Vars.TimerCyclesCounter[i] == Vars.TimerCyclesPerPulse[i][Vars.TimerCyclesPerPulseIndex[i]])
+					{
+						Vars.TimerCyclesCounter[i] = 0;
+						
+						if (++Vars.TimerCyclesPerPulseIndex[i] == Vars.TimerCyclesPerPulseIndexMaxVal[i])
+						{
+							Vars.TimerCyclesPerPulseIndex[i] = 0;
+						}
+
+						if (++Vars.AxleCounter[i] == Vars.AxleCountTotal[i])
+						{
+							if (Vars.TimerCyclesPerPulseIndexMaxVal[i] == 6 && Vars.NumberOfCars[1])
+							{
+								Vars.TimerCyclesPerPulseIndex[i] = 0;
+
+								Vars.AxleCounter[i] = 0;
+
+								Vars.AxleCountTotal[i] = Vars.NumberOfCars[1] * 4;
+
+								Vars.TimerCyclesPerPulse[i][1] = (long)Vars.TimerCyclesValue[1];
+								if ((Vars.TimerCyclesValue[1] - (double)Vars.TimerCyclesPerPulse[i][1]) >= 0.5)
+									Vars.TimerCyclesPerPulse[i][1]++;
+								Vars.TimerCyclesPerPulse[i][2] = Vars.TimerCyclesPerPulse[i][0];
+								Vars.TimerCyclesPerPulse[i][3] = (long)Vars.TimerCyclesValue[2];
+								if ((Vars.TimerCyclesValue[2] - (double)Vars.TimerCyclesPerPulse[i][3]) >= 0.5)
+									Vars.TimerCyclesPerPulse[i][3]++;
+
+								Vars.TimerCyclesPerPulseIndexMaxVal[i] = 4;
+							}
+							else
+							{
+								Vars.AxleActive[i] = 0;
+
+								if (i == 3)
+								{
+									Vars.TrainSimulation = 0;
+
+									Vars.TrainSimulationState = 0;
+									Vars.TrainSimulationCounter = 0;
+									Vars.CheckTrainSimulation = 1;
+								}
+							}
+						}
+					}
+				}
+			}
+			
+			if (i < 3 && Vars.TimerCyclesShiftCounter == Vars.TimerCyclesShift[i])
+			{
+				Vars.AxleActive[i+1] = 1;
+			}
+		}
+		
+		Vars.TimerCyclesShiftCounter++;
+
+		outportb(0x0100, Vars.DigitalOutputsPort0);
+	}
+
+	if (Vars.CheckTrainSimulation)
+	{
+		if (++Vars.TrainSimulationCounter >= (5L * Vars.TimerFrequency))
+		{
+			if (Vars.StopTrainSimulation)
+			{
+				Vars.DigitalOutputsPort0 |= Vars.TrainSignal[4];
+				outportb(0x0100, Vars.DigitalOutputsPort0);
+
+				Vars.SendTrainSimulationCompleted = 1;
+				
+				Vars.StopTrainSimulation = 0;
+			}
+			else if (Vars.TrainSimulationState)
+			{
+				Vars.StartAxles = 1;
+			}
+			else
+			{
+				Vars.DigitalOutputsPort0 |= Vars.TrainSignal[4];
+				outportb(0x0100, Vars.DigitalOutputsPort0);
+
+				if (Vars.NumberOfTrains)
+				{
+					if (++Vars.NumberOfTrainsCounter >= Vars.NumberOfTrains)
+					{
+						Vars.SendTrainSimulationCompleted = 1;
+					}
+					else
+					{
+						Vars.SecondsBetweenTrainsCounter = 0;
+						Vars.CheckSecondsBetweenTrains = 1;
+					}
+				}
+				else
+				{
+					Vars.SecondsBetweenTrainsCounter = 0;
+					Vars.CheckSecondsBetweenTrains = 1;
+				}
+			}
+
+			Vars.CheckTrainSimulation = 0;
+		}
+	}
+
+	if (Vars.CheckSecondsBetweenTrains)
+	{
+		if (++Vars.SecondsBetweenTrainsCounter >= (Vars.SecondsBetweenTrains * Vars.TimerFrequency))
+		{
+			BeginTrainSimulationProcess();
+
+			Vars.CheckSecondsBetweenTrains = 0;
+		}
+	}
+
+	Vars.TimerCounter++;
+
+	outport(0xff22, 0x8000);
+}
+
+void ManageTrainSimulationKey(void)
+{
+	if (Vars.TrainSimulationStateFromKey)
+	{
+		if (!Vars.TrainSimulationKeyCheck && (~inportb(0x0101) & 0x01))
+		{
+			delay_ms(100);
+
+			if (~inportb(0x0101) & 0x01)
+			{
+				Vars.TrainSimulationKeyState = 1;
+				Vars.TrainSimulationKeyCheck = 1;
+			}
+		}
+		else
+		{
+			if (Vars.TrainSimulationKeyCheck && !(~inportb(0x0101) & 0x01))
+			{
+				delay_ms(100);
+
+				if (!(~inportb(0x0101) & 0x01))
+				{
+					EndTrainSimulationProcess();
+
+					Vars.TrainSimulationKeyState = 0;
+					Vars.TrainSimulationKeyCheck = 0;
+					Vars.TrainSimulationStateFromKey = 0;
+				}
+			}
+		}
+	}
+	else
+	{
+		if (!Vars.TrainSimulationKeyCheck && !(~inportb(0x0101) & 0x01))
+		{
+			delay_ms(100);
+
+			if (!(~inportb(0x0101) & 0x01))
+			{
+				Vars.TrainSimulationKeyState = 0;
+				Vars.TrainSimulationKeyCheck = 1;
+			}
+		}
+		else if (Vars.TrainSimulationKeyCheck && (~inportb(0x0101) & 0x01))
+		{
+			delay_ms(100);
+
+			if (~inportb(0x0101) & 0x01)
+			{
+				if (~inportb(0x0101) & 0x02)
+					Vars.TrainDirection = 2;
+				else
+					Vars.TrainDirection = 1;
+
+				Vars.NumberOfTrainsCounter = 0;
+				BeginTrainSimulationProcess();
+
+				Vars.TrainSimulationKeyState = 1;
+				Vars.TrainSimulationKeyCheck = 0;
+				Vars.TrainSimulationStateFromKey = 1;
+			}
+		}
+	}
+}
+
+void BeginTrainSimulationProcess(void)
+{
+	Vars.DigitalOutputsPort0 &= 0xFF ^ Vars.TrainSignal[4];
+	outportb(0x0100, Vars.DigitalOutputsPort0);
+
+	Vars.TrainSimulationState = 1;
+	Vars.TrainSimulationCounter = 0;
+	Vars.CheckTrainSimulation = 1;
+}
+
+void EndTrainSimulationProcess(void)
+{
+	Vars.TrainSimulation = 0;
+	Vars.DigitalOutputsPort0 &= 0xFF ^ Vars.TrainSignal[0];
+	Vars.DigitalOutputsPort0 &= 0xFF ^ Vars.TrainSignal[1];
+	Vars.DigitalOutputsPort0 &= 0xFF ^ Vars.TrainSignal[2];
+	Vars.DigitalOutputsPort0 &= 0xFF ^ Vars.TrainSignal[3];
+	outportb(0x0100, Vars.DigitalOutputsPort0);
+
+	Vars.StopTrainSimulation = 1;
+
+	Vars.TrainSimulationState = 0;
+	Vars.TrainSimulationCounter = 0;
+	Vars.CheckTrainSimulation = 1;
+
+	Vars.CheckSecondsBetweenTrains = 0;
+}
+
+void StartTrainSimulation(void)
+{
+	int i;
+
+	if (Vars.TrainDirection == 1)
+	{
+		Vars.TrainSignal[0] = SIGNAL_4_ADDR;
+		Vars.TrainSignal[1] = SIGNAL_3_ADDR;
+		Vars.TrainSignal[2] = SIGNAL_2_ADDR;
+		Vars.TrainSignal[3] = SIGNAL_1_ADDR;
+	}
+	else if (Vars.TrainDirection == 2)
+	{
+		Vars.TrainSignal[0] = SIGNAL_1_ADDR;
+		Vars.TrainSignal[1] = SIGNAL_2_ADDR;
+		Vars.TrainSignal[2] = SIGNAL_3_ADDR;
+		Vars.TrainSignal[3] = SIGNAL_4_ADDR;
+	}
+	else
+	{
+		Vars.TrainSignal[0] = 0x40;
+		Vars.TrainSignal[1] = 0x40;
+		Vars.TrainSignal[2] = 0x40;
+		Vars.TrainSignal[3] = 0x40;
+	}
+
+	if (Vars.TrainSpeedMPH > 0)
+	{
+		Vars.TimerCyclesValue[0] = (Vars.TrainDistance[0] / Vars.TrainSpeedMPH) * (31250000.0 / (1397.0 * (double)Vars.TimerMaxCount));
+		Vars.TimerCyclesValue[1] = (Vars.TrainDistance[1] / Vars.TrainSpeedMPH) * (31250000.0 / (1397.0 * (double)Vars.TimerMaxCount));
+		Vars.TimerCyclesValue[2] = (Vars.TrainDistance[2] / Vars.TrainSpeedMPH) * (31250000.0 / (1397.0 * (double)Vars.TimerMaxCount));
+		Vars.TimerCyclesValue[3] = (101.6 / Vars.TrainSpeedMPH) * (31250000.0 / (1397.0 * (double)Vars.TimerMaxCount));
+		Vars.TimerCyclesValue[4] = (Vars.TrainDistance[3] / Vars.TrainSpeedMPH) * (31250000.0 / (1397.0 * (double)Vars.TimerMaxCount));
+	}
+	else
+	{
+		Vars.TimerCyclesValue[0] = 0;
+		Vars.TimerCyclesValue[1] = 0;
+		Vars.TimerCyclesValue[2] = 0;
+		Vars.TimerCyclesValue[3] = 0;
+		Vars.TimerCyclesValue[4] = 0;
+	}
+
+	Vars.TimerCyclesCounter[0] = 0;
+	Vars.TimerCyclesCounter[1] = 0;
+	Vars.TimerCyclesCounter[2] = 0;
+	Vars.TimerCyclesCounter[3] = 0;
+
+	Vars.TimerCyclesPerPulseIndex[0] = 0;
+	Vars.TimerCyclesPerPulseIndex[1] = 0;
+	Vars.TimerCyclesPerPulseIndex[2] = 0;
+	Vars.TimerCyclesPerPulseIndex[3] = 0;
+
+	Vars.AxleCounter[0] = 0;
+	Vars.AxleCounter[1] = 0;
+	Vars.AxleCounter[2] = 0;
+	Vars.AxleCounter[3] = 0;
+	
+	Vars.AxleActive[0] = 1;
+	Vars.AxleActive[1] = 0;
+	Vars.AxleActive[2] = 0;
+	Vars.AxleActive[3] = 0;
+
+	Vars.TimerCyclesShift[0] = (long)Vars.TimerCyclesValue[3];
+	if ((Vars.TimerCyclesValue[3] - (double)Vars.TimerCyclesShift[0]) >= 0.5)
+		Vars.TimerCyclesShift[0]++;
+	Vars.TimerCyclesShift[1] = (long)Vars.TimerCyclesValue[4];
+	if ((Vars.TimerCyclesValue[4] - (double)Vars.TimerCyclesShift[1]) >= 0.5)
+		Vars.TimerCyclesShift[1]++;
+	Vars.TimerCyclesShift[2] = Vars.TimerCyclesShift[0] + Vars.TimerCyclesShift[1];
+
+	Vars.TimerCyclesPerPulseHigh = Vars.TimerCyclesShift[0] * 2L;
+
+	Vars.TimerCyclesShiftCounter = 0;
+
+	if (Vars.NumberOfCars[0] || Vars.NumberOfCars[1])
+	{
+		if (Vars.NumberOfCars[0])
+		{
+			for (i = 0;i < 4;i++)
+			{
+				Vars.AxleCountTotal[i] = Vars.NumberOfCars[0] * 6;
+
+				Vars.TimerCyclesPerPulse[i][0] = (long)Vars.TimerCyclesValue[0];
+				if ((Vars.TimerCyclesValue[0] - (double)Vars.TimerCyclesPerPulse[i][0]) >= 0.5)
+					Vars.TimerCyclesPerPulse[i][0]++;
+				Vars.TimerCyclesPerPulse[i][1] = Vars.TimerCyclesPerPulse[i][0];
+				Vars.TimerCyclesPerPulse[i][2] = (long)Vars.TimerCyclesValue[1];
+				if ((Vars.TimerCyclesValue[1] - (double)Vars.TimerCyclesPerPulse[i][2]) >= 0.5)
+					Vars.TimerCyclesPerPulse[i][2]++;
+				Vars.TimerCyclesPerPulse[i][3] = Vars.TimerCyclesPerPulse[i][0];
+				Vars.TimerCyclesPerPulse[i][4] = Vars.TimerCyclesPerPulse[i][0];
+				Vars.TimerCyclesPerPulse[i][5] = (long)Vars.TimerCyclesValue[2];
+				if ((Vars.TimerCyclesValue[2] - (double)Vars.TimerCyclesPerPulse[i][5]) >= 0.5)
+					Vars.TimerCyclesPerPulse[i][5]++;
+
+				Vars.TimerCyclesPerPulseIndexMaxVal[i] = 6;
+			}
+		}
+		else
+		{
+			for (i = 0;i < 4;i++)
+			{
+				Vars.AxleCountTotal[i] = Vars.NumberOfCars[1] * 4;
+
+				Vars.TimerCyclesPerPulse[i][0] = (long)Vars.TimerCyclesValue[0];
+				if ((Vars.TimerCyclesValue[0] - (double)Vars.TimerCyclesPerPulse[i][0]) >= 0.5)
+					Vars.TimerCyclesPerPulse[i][0]++;
+				Vars.TimerCyclesPerPulse[i][1] = (long)Vars.TimerCyclesValue[1];
+				if ((Vars.TimerCyclesValue[1] - (double)Vars.TimerCyclesPerPulse[i][1]) >= 0.5)
+					Vars.TimerCyclesPerPulse[i][1]++;
+				Vars.TimerCyclesPerPulse[i][2] = Vars.TimerCyclesPerPulse[i][0];
+				Vars.TimerCyclesPerPulse[i][3] = (long)Vars.TimerCyclesValue[2];
+				if ((Vars.TimerCyclesValue[2] - (double)Vars.TimerCyclesPerPulse[i][3]) >= 0.5)
+					Vars.TimerCyclesPerPulse[i][3]++;
+
+				Vars.TimerCyclesPerPulseIndexMaxVal[i] = 4;
+			}
+		}
+		
+		Vars.TrainSimulation = 1;
+	}
+	else
+	{
+		Vars.TrainSimulation = 0;
+	}
+}
+
+int CheckSerialComm(void)
+{
+	char ch;
+	int i;
+	char param_buf[10];
+	char value_buf[15];
+	int param;
+    long val;
+	unsigned char check_sum;
+	unsigned char pc_check_sum;
+
+	check_sum = 0;
+
+	if (!serhit1(CommVals.m_comPC1)) return -1;
+	ch = getser1(CommVals.m_comPC1);
+	if (ch != '~') return -1;
+	check_sum += ch;
+
+	while (!serhit1(CommVals.m_comPC1)) hitwd();
+	ch = getser1(CommVals.m_comPC1);
+	if (ch != '~') return -1;
+	check_sum += ch;
+
+	while (!serhit1(CommVals.m_comPC1)) hitwd();
+	ch = getser1(CommVals.m_comPC1);
+	if (ch != '2') return -1;
+	check_sum += ch;
+
+	while (!serhit1(CommVals.m_comPC1)) hitwd();
+	ch = getser1(CommVals.m_comPC1);
+	check_sum += ch;
+	
+	if (ch == '1')
+	{
+		while (!serhit1(CommVals.m_comPC1)) hitwd();
+		ch = getser1(CommVals.m_comPC1);
+		check_sum += ch;
+		if (ch == '1') // Start
+		{
+			Vars.NumberOfTrainsCounter = 0;
+			BeginTrainSimulationProcess();
+		}
+		else if (ch == '0') // Stop
+		{
+			EndTrainSimulationProcess();
+		}
+	}
+	else if (ch == '2')	// Configuration Parameters
+	{
+		memset(param_buf, 0, sizeof(param_buf));
+
+		for (i=0; i<3; i++)
+		{
+			while (!serhit1(CommVals.m_comPC1)) hitwd();
+  			param_buf[i] = getser1(CommVals.m_comPC1);
+			check_sum += param_buf[i];
+		}
+		param = atoi(param_buf);
+
+		memset(value_buf, 0, sizeof(value_buf));
+
+		for (i=0; i<11; i++)
+		{
+			while (!serhit1(CommVals.m_comPC1)) hitwd();
+  			value_buf[i] = getser1(CommVals.m_comPC1);
+			check_sum += value_buf[i];
+		}
+
+		while (!serhit1(CommVals.m_comPC1)) hitwd();
+		pc_check_sum = getser1(CommVals.m_comPC1);
+
+		if (pc_check_sum != check_sum)
+			return -1;
+
+		val = atol(value_buf);
+
+		switch (param)
+		{
+			case PARAM_ID_NUMBER_OF_TRAINS :			Vars.NumberOfTrains = (int)val; break;
+			case PARAM_ID_SECONDS_BETWEEN_TRAINS :		Vars.SecondsBetweenTrains = val; break;
+
+			case PARAM_ID_TRAIN_DIRECTION :				Vars.TrainDirection = (int)val; break;
+			case PARAM_ID_TRAIN_SPEED :					Vars.TrainSpeedMPH = (double)val/10000.0; break;
+
+			case PARAM_ID_NUMBER_OF_LOCOMOTIVES :		Vars.NumberOfCars[0] = (int)val; break;
+			case PARAM_ID_NUMBER_OF_RAILCARS :			Vars.NumberOfCars[1] = (int)val; break;
+
+			case PARAM_ID_DISTANCE_BETWEEN_AXLES :		Vars.TrainDistance[0] = (double)val/1000.0; break;
+			case PARAM_ID_DISTANCE_BETWEEN_BOGIES :		Vars.TrainDistance[1] = (double)val/1000.0; break;
+			case PARAM_ID_DISTANCE_BETWEEN_CARS :		Vars.TrainDistance[2] = (double)val/1000.0; break;
+			case PARAM_ID_DISTANCE_BETWEEN_SENSORS :	Vars.TrainDistance[3] = (double)val/1000.0; break;
+
+			default : break;
+		}
+	}
+	else
+		return -1;
+
+	return 0;
+}
